@@ -33,7 +33,7 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 24px 16px;
-      padding-top: 140px;
+      padding-top: 140px; /* fallback, overridden by JS */
     }
 
     /* ---- Countdown Bar ---- */
@@ -1039,9 +1039,15 @@
         });
       }
 
+      function syncPadding() {
+        var bar = document.getElementById('countdown-bar');
+        document.body.style.paddingTop = (bar.offsetHeight + 8) + 'px';
+      }
+
       update();
       dimPast();
-      setInterval(function() { update(); dimPast(); }, 1000);
+      syncPadding();
+      setInterval(function() { update(); dimPast(); syncPadding(); }, 1000);
     })();
 
     // Register service worker for offline support
