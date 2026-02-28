@@ -33,7 +33,7 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 24px 16px;
-      padding-top: 110px;
+      padding-top: 140px;
     }
 
     /* ---- Countdown Bar ---- */
@@ -58,11 +58,20 @@
       letter-spacing: 3px;
       margin-bottom: 2px;
     }
-    #countdown-bar .cb-details {
+    #countdown-bar .cb-acts {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
       font-weight: 600;
       font-size: 0.8rem;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
+    #countdown-bar .cb-act { white-space: nowrap; }
+    #countdown-bar .cb-act-sep {
+      color: var(--grid-line);
+      font-weight: 400;
+    }
+    #countdown-bar .cb-section { margin-bottom: 6px; }
     #countdown-bar .cb-time {
       color: #fff;
       font-size: 2.4rem;
@@ -372,6 +381,9 @@
       .picks-table td { padding: 6px 8px; }
     }
 
+    /* ---- Past acts ---- */
+    .slot.past, .mobile-slot.past, .picks-table tr.past td { opacity: 0.5; }
+
     /* ---- Footer ---- */
     .page-footer {
       text-align: center;
@@ -409,8 +421,8 @@
   </svg>
 
   <div id="countdown-bar">
-    <div class="cb-label" id="cb-label">Next up</div>
-    <div class="cb-details" id="cb-details"></div>
+    <div id="cb-now" class="cb-section"></div>
+    <div id="cb-next" class="cb-section"></div>
     <div class="cb-time" id="cb-time"></div>
   </div>
 
@@ -912,19 +924,33 @@
     // Countdown timer for picked sets
     (function() {
       var picks = [
+        // Friday
         { start: new Date(2026,1,27,18,30), end: new Date(2026,1,27,20,0),  artist: 'Ruben de Ronde',          stage: 'Area One',  cls: 'c1' },
         { start: new Date(2026,1,27,20,0),  end: new Date(2026,1,27,21,0),  artist: 'Armin van Buuren',        stage: 'Area One',  cls: 'c1' },
         { start: new Date(2026,1,27,21,0),  end: new Date(2026,1,27,22,0),  artist: 'Aly & Fila',              stage: 'Area Two',  cls: 'c2' },
+        { start: new Date(2026,1,27,21,0),  end: new Date(2026,1,27,22,0),  artist: 'Armin B2B Deep Dish',     stage: 'Area One',  cls: 'c1' },
         { start: new Date(2026,1,27,22,0),  end: new Date(2026,1,28,0,0),   artist: 'Armin van Buuren 25 Yrs', stage: 'Area One',  cls: 'c1' },
+        // Saturday
         { start: new Date(2026,1,28,21,0),  end: new Date(2026,1,28,22,0),  artist: 'Avalan Rokston',          stage: 'Area One',  cls: 'c1' },
+        { start: new Date(2026,1,28,21,0),  end: new Date(2026,1,28,22,0),  artist: 'Kyau & Albert',           stage: 'Area Four', cls: 'c4' },
         { start: new Date(2026,1,28,22,0),  end: new Date(2026,1,28,23,0),  artist: 'Super8 & Tab',            stage: 'Area Four', cls: 'c4' },
+        { start: new Date(2026,1,28,22,0),  end: new Date(2026,1,28,23,0),  artist: 'Joa',                     stage: 'Area One',  cls: 'c1' },
         { start: new Date(2026,1,28,23,0),  end: new Date(2026,2,1,0,0),    artist: 'Ottagon',                 stage: 'Area Two',  cls: 'c2' },
         { start: new Date(2026,2,1,0,0),    end: new Date(2026,2,1,1,0),    artist: 'Cosmic Gate',             stage: 'Area Two',  cls: 'c2' },
+        { start: new Date(2026,2,1,0,0),    end: new Date(2026,2,1,1,0),    artist: '\u00D8rjan Nilsen',       stage: 'Area Four', cls: 'c4' },
         { start: new Date(2026,2,1,1,0),    end: new Date(2026,2,1,2,30),   artist: 'Armin van Buuren',        stage: 'Area One',  cls: 'c1' },
-        { start: new Date(2026,2,1,3,0),    end: new Date(2026,2,1,4,0),    artist: 'Andrew Rayel Presents Extasia', stage: 'Area Two', cls: 'c2' }
+        { start: new Date(2026,2,1,3,0),    end: new Date(2026,2,1,4,0),    artist: 'Andrew Rayel Pres. Extasia', stage: 'Area Two', cls: 'c2' },
+        { start: new Date(2026,2,1,3,0),    end: new Date(2026,2,1,4,0),    artist: 'Sean Tyas',               stage: 'Area Four', cls: 'c4' },
+        { start: new Date(2026,2,1,4,0),    end: new Date(2026,2,1,5,0),    artist: 'Richard Durand',          stage: 'Area Two',  cls: 'c2' },
+        { start: new Date(2026,2,1,4,0),    end: new Date(2026,2,1,5,0),    artist: 'Signum',                  stage: 'Area Four', cls: 'c4' }
       ];
-      var labelEl = document.getElementById('cb-label');
-      var detailsEl = document.getElementById('cb-details');
+      // ?t=2026-02-28T22:55 to simulate a fake time
+      var tParam = new URLSearchParams(location.search).get('t');
+      var timeOffset = tParam ? new Date(tParam) - new Date() : 0;
+      function getNow() { return new Date(Date.now() + timeOffset); }
+
+      var nowEl = document.getElementById('cb-now');
+      var nextEl = document.getElementById('cb-next');
       var timeEl = document.getElementById('cb-time');
 
       function pad(n) { return n < 10 ? '0' + n : n; }
@@ -936,33 +962,81 @@
         return h > 0 ? h + ':' + pad(m) + ':' + pad(s) : m + ':' + pad(s);
       }
 
+      function renderActs(acts) {
+        return '<div class="cb-acts">' + acts.map(function(a, i) {
+          return (i > 0 ? '<span class="cb-act-sep">&middot;</span>' : '') +
+            '<span class="cb-act ' + a.cls + '">' + a.artist + ' <span class="cb-sep" style="margin:0 3px">/</span> ' + a.stage + '</span>';
+        }).join('') + '</div>';
+      }
+
       function update() {
-        var now = new Date();
-        var playing = null, next = null;
+        var now = getNow();
+        var playing = picks.filter(function(p) { return now >= p.start && now < p.end; });
+        var nextTime = null;
         for (var i = 0; i < picks.length; i++) {
-          if (now >= picks[i].start && now < picks[i].end) { playing = picks[i]; next = picks[i + 1] || null; break; }
-          if (now < picks[i].start) { next = picks[i]; break; }
+          if (picks[i].start > now) { nextTime = picks[i].start; break; }
+        }
+        var upcoming = nextTime ? picks.filter(function(p) { return p.start.getTime() === nextTime.getTime(); }) : [];
+
+        if (playing.length > 0) {
+          nowEl.innerHTML = '<div class="cb-label">Now</div>' + renderActs(playing);
+        } else {
+          nowEl.innerHTML = '';
         }
 
-        if (playing && next) {
-          labelEl.textContent = 'Now: ' + playing.artist;
-          labelEl.className = 'cb-label ' + playing.cls;
-          detailsEl.innerHTML = '<span class="' + next.cls + '">' + next.artist + '</span><span class="cb-sep">/</span><span class="' + next.cls + '">' + next.stage + '</span>';
-          timeEl.textContent = fmt(next.start - now);
-        } else if (next) {
-          labelEl.textContent = 'Next up';
-          labelEl.className = 'cb-label';
-          detailsEl.innerHTML = '<span class="' + next.cls + '">' + next.artist + '</span><span class="cb-sep">/</span><span class="' + next.cls + '">' + next.stage + '</span>';
-          timeEl.textContent = fmt(next.start - now);
+        if (upcoming.length > 0) {
+          nextEl.innerHTML = '<div class="cb-label">Next up</div>' + renderActs(upcoming);
+          timeEl.textContent = fmt(nextTime - now);
+        } else if (playing.length > 0) {
+          nextEl.innerHTML = '';
+          timeEl.innerHTML = '';
         } else {
-          labelEl.textContent = '';
-          detailsEl.innerHTML = '';
+          nextEl.innerHTML = '';
           timeEl.innerHTML = '<span style="color:var(--text-dim);font-size:0.85rem">No more picks</span>';
         }
       }
 
+      // Dim past acts in timetable and picks
+      function dimPast() {
+        var now = getNow();
+        // Parse "HH:MM - HH:MM" end time relative to a base date
+        function getEnd(timeText, baseDate, startHour) {
+          var m = timeText.match(/(\d{2}):(\d{2})\s*-\s*(\d{2}):(\d{2})/);
+          if (!m) return null;
+          var eh = parseInt(m[3]), em = parseInt(m[4]);
+          var d = new Date(baseDate);
+          d.setHours(eh, em, 0, 0);
+          if (eh < startHour) d.setDate(d.getDate() + 1);
+          return d;
+        }
+        // Desktop + mobile slots
+        document.querySelectorAll('.day-section').forEach(function(section) {
+          var isFri = section.querySelector('summary').textContent.indexOf('Friday') >= 0;
+          var base = isFri ? new Date(2026,1,27) : new Date(2026,1,28);
+          var start = isFri ? 18 : 21;
+          section.querySelectorAll('.slot-time, .mobile-time').forEach(function(el) {
+            var end = getEnd(el.textContent, base, start);
+            if (end && now >= end) el.closest('.slot, .mobile-slot').classList.add('past');
+            else if (el.closest('.slot, .mobile-slot')) el.closest('.slot, .mobile-slot').classList.remove('past');
+          });
+        });
+        // Picks tables
+        document.querySelectorAll('.picks-section .collapsible-sub').forEach(function(sub) {
+          var isFri = sub.querySelector('summary').textContent.indexOf('Friday') >= 0;
+          var base = isFri ? new Date(2026,1,27) : new Date(2026,1,28);
+          var start = isFri ? 18 : 21;
+          sub.querySelectorAll('.pick-time').forEach(function(el) {
+            var end = getEnd(el.textContent, base, start);
+            var tr = el.closest('tr');
+            if (end && now >= end) tr.classList.add('past');
+            else tr.classList.remove('past');
+          });
+        });
+      }
+
       update();
-      setInterval(update, 1000);
+      dimPast();
+      setInterval(function() { update(); dimPast(); }, 1000);
     })();
 
     // Register service worker for offline support
