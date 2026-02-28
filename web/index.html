@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ASOT 2026">
+  <meta name="theme-color" content="#0a0b0d">
+  <link rel="manifest" href='data:application/json,{"name":"ASOT 2026","short_name":"ASOT 2026","start_url":".","display":"standalone","background_color":"%230a0b0d","theme_color":"%230a0b0d"}'>
+  <title>ASOT 2026 — Ahoy Rotterdam</title>
+  <style>
+    :root {
+      --bg: #0a0b0d;
+      --bg-slot: #111215;
+      --grid-line: #222;
+      --text-dim: #555;
+      --text-time: #777;
+      --area1: #e8457a;
+      --area2: #4ec98b;
+      --area3: #5fa8d3;
+      --area4: #5ed6b3;
+      --area5: #a594f9;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: #bbb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.4;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      padding-top: calc(24px + env(safe-area-inset-top));
+    }
+
+    /* ---- Header ---- */
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 32px 0;
+    }
+    .page-header h1 {
+      color: #fff;
+      font-size: 2.4rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .page-header .subtitle {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* ---- Section headings ---- */
+    .day-section { margin-bottom: 48px; }
+    .day-section h2,
+    .picks-section h2 {
+      color: #fff;
+      font-size: 1.4rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--grid-line);
+    }
+
+    /* ---- My Picks ---- */
+    .picks-section { margin-bottom: 48px; }
+    .picks-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .picks-table th {
+      text-align: left;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 400;
+      font-size: 0.7rem;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--grid-line);
+    }
+    .picks-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #181818;
+    }
+    .picks-table .day-divider td {
+      padding: 16px 12px 6px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--grid-line);
+    }
+    .pick-time { color: var(--text-time); white-space: nowrap; }
+    .pick-artist { text-transform: uppercase; font-weight: 600; }
+    .pick-stage { text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
+    .picks-table tr.secondary td { filter: saturate(0.35); }
+    .c1 { color: var(--area1); }
+    .c2 { color: var(--area2); }
+    .c3 { color: var(--area3); }
+    .c4 { color: var(--area4); }
+    .c5 { color: var(--area5); }
+
+    .pick-cell {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ---- Desktop Timetable Grid ---- */
+    .timetable-grid {
+      display: grid;
+      gap: 0;
+      column-gap: 2px;
+    }
+    .friday-grid {
+      grid-template-columns: 56px repeat(3, 1fr);
+      grid-template-rows: auto repeat(29, 30px);
+    }
+    .saturday-grid {
+      grid-template-columns: 56px repeat(5, 1fr);
+      grid-template-rows: auto repeat(37, 30px);
+    }
+
+    /* Grid headers */
+    .grid-header {
+      padding: 12px 8px;
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      border-bottom: 1px solid var(--grid-line);
+    }
+    .grid-header small {
+      display: block;
+      font-weight: 400;
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+      opacity: 0.6;
+      margin-top: 2px;
+    }
+    .time-col-hdr { grid-column: 1; }
+
+    /* Time labels */
+    .time-label {
+      grid-column: 1;
+      color: var(--text-time);
+      font-size: 0.7rem;
+      padding: 2px 6px 0 0;
+      text-align: right;
+      border-top: 1px solid var(--grid-line);
+    }
+
+    /* DJ Slots */
+    .slot {
+      z-index: 1;
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border-left: 3px solid;
+      background: var(--bg-slot);
+      overflow: hidden;
+      border-top: 1px solid var(--grid-line);
+    }
+    .slot-time {
+      font-size: 0.6rem;
+      opacity: 0.65;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .slot-artist {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .slot.a1 { border-left-color: var(--area1); color: var(--area1); }
+    .slot.a2 { border-left-color: var(--area2); color: var(--area2); }
+    .slot.a3 { border-left-color: var(--area3); color: var(--area3); }
+    .slot.a4 { border-left-color: var(--area4); color: var(--area4); }
+    .slot.a5 { border-left-color: var(--area5); color: var(--area5); }
+
+
+    .slot-artist small,
+    .mobile-artist small,
+    .pick-artist small {
+      display: block;
+      font-weight: 400;
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+      opacity: 0.6;
+      margin-top: 1px;
+    }
+
+    /* Slot row: artist name + link icons */
+    .slot-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .slot-links {
+      display: flex;
+      gap: 3px;
+      flex-shrink: 0;
+      align-items: center;
+      margin-top: 1px;
+    }
+    .set-link {
+      display: inline-flex;
+      color: currentColor;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .set-link:hover { opacity: 1; }
+    .set-link svg { width: 14px; height: 14px; }
+    .set-link.no-link { opacity: 0.2; cursor: default; }
+
+    /* ---- Mobile Layout ---- */
+    .timetable-mobile { display: none; }
+
+    @media (max-width: 768px) {
+      .timetable-desktop { display: none; }
+      .timetable-mobile { display: block; }
+
+      .mobile-area { margin-bottom: 24px; }
+      .mobile-area h3 {
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 3px;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--grid-line);
+      }
+      .mobile-area h3 small {
+        font-weight: 400;
+        opacity: 0.6;
+      }
+      .mobile-slot {
+        display: flex;
+        gap: 12px;
+        padding: 10px 12px;
+        border-bottom: 1px solid #181818;
+        border-left: 3px solid;
+        align-items: baseline;
+      }
+      .mobile-time {
+        font-size: 0.75rem;
+        opacity: 0.65;
+        white-space: nowrap;
+        min-width: 95px;
+      }
+      .mobile-artist {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .mobile-slot.a1 { border-left-color: var(--area1); color: var(--area1); }
+      .mobile-slot.a2 { border-left-color: var(--area2); color: var(--area2); }
+      .mobile-slot.a3 { border-left-color: var(--area3); color: var(--area3); }
+      .mobile-slot.a4 { border-left-color: var(--area4); color: var(--area4); }
+      .mobile-slot.a5 { border-left-color: var(--area5); color: var(--area5); }
+      .mobile-wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .picks-table { font-size: 0.78rem; }
+      .picks-table th,
+      .picks-table td { padding: 6px 8px; }
+    }
+
+    /* ---- Footer ---- */
+    .page-footer {
+      text-align: center;
+      padding: 32px 0;
+      color: var(--text-dim);
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-top: 1px solid var(--grid-line);
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SVG Icon Sprites -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-sp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M8 9.5c2.7-.8 5.3-.6 8 .5"/>
+      <path d="M8 12.5c2.3-.6 4.5-.5 7 .4"/>
+      <path d="M9 15.5c1.7-.4 3.3-.3 5 .3"/>
+    </symbol>
+    <symbol id="i-sc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 17h18a4 4 0 0 0 0-8 6 6 0 0 0-11.3-2.3A4 4 0 0 0 3 11v6z"/>
+    </symbol>
+    <symbol id="i-yt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="4"/>
+      <polygon points="10,8 16,12 10,16"/>
+    </symbol>
+    <symbol id="i-no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="8" y1="12" x2="16" y2="12"/>
+    </symbol>
+  </svg>
+
+  <header class="page-header">
+    <h1>ASOT 2026</h1>
+    <p class="subtitle">Celebrating 25 Years &middot; Ahoy Rotterdam &middot; 27-28 February</p>
+  </header>
+
+  <!-- ==================== MY PICKS ==================== -->
+  <section class="picks-section">
+    <h2>My Picks</h2>
+    <table class="picks-table">
+      <thead>
+        <tr><th>Time</th><th>Artist</th><th>Stage</th></tr>
+      </thead>
+      <tbody>
+        <tr class="day-divider"><td colspan="3">Friday 27 February</td></tr>
+        <tr class="secondary">
+          <td class="pick-time">18:30 - 20:00</td>
+          <td class="pick-artist c1"><span class="pick-cell"><span>Ruben de Ronde<small>Progressive Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/rubenderonde/ruben-de-ronde-live-at-ultra-music-festival-2025-asot" class="set-link" target="_blank" rel="noopener" title="Ruben de Ronde"><svg><use href="#i-sc"/></svg></a></span></span></td>
+          <td class="pick-stage c1">Area One</td>
+        </tr>
+        <tr>
+          <td class="pick-time">20:00 - 21:00</td>
+          <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
+          <td class="pick-stage c1">Area One</td>
+        </tr>
+        <tr>
+          <td class="pick-time">21:00 - 22:00</td>
+          <td class="pick-artist c2"><span class="pick-cell"><span>Aly &amp; Fila<small>Uplifting Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/alyandfila/ds2025" class="set-link" target="_blank" rel="noopener" title="Aly &amp; Fila"><svg><use href="#i-sc"/></svg></a></span></span></td>
+          <td class="pick-stage c2">Area Two</td>
+        </tr>
+        <tr>
+          <td class="pick-time">22:00 - 00:00</td>
+          <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren 25 Years Celebration Set<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
+          <td class="pick-stage c1">Area One</td>
+        </tr>
+        <tr class="day-divider"><td colspan="3">Saturday 28 February</td></tr>
+        <tr>
+          <td class="pick-time">21:00 - 22:00</td>
+          <td class="pick-artist c4"><span class="pick-cell"><span>Kyau &amp; Albert<small>Progressive Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/euphonicsessions/euphonic-sessions-december2025" class="set-link" target="_blank" rel="noopener" title="Kyau &amp; Albert"><svg><use href="#i-sc"/></svg></a></span></span></td>
+          <td class="pick-stage c4">Area Four</td>
+        </tr>
+        <tr>
+          <td class="pick-time">22:00 - 23:00</td>
+          <td class="pick-artist c4"><span class="pick-cell"><span>Super8 &amp; Tab<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/super8tab/sets/supertab-radio" class="set-link" target="_blank" rel="noopener" title="Super8 &amp; Tab"><svg><use href="#i-sc"/></svg></a></span></span></td>
+          <td class="pick-stage c4">Area Four</td>
+        </tr>
+        <tr>
+          <td class="pick-time">23:00 - 00:00</td>
+          <td class="pick-artist c2"><span class="pick-cell"><span>Ottagon<small>Melodic Techno</small></span> <span class="slot-links"><a href="https://soundcloud.com/giuseppeottaviani/ottagon-live-at-dreamstate-europe-on-12th-april-2025" class="set-link" target="_blank" rel="noopener" title="Ottagon"><svg><use href="#i-sc"/></svg></a></span></span></td>
+          <td class="pick-stage c2">Area Two</td>
+        </tr>
+        <tr>
+          <td class="pick-time">00:00 - 01:00</td>
+          <td class="pick-artist c2"><span class="pick-cell"><span>Cosmic Gate<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/1001tracklists/cosmic-gate-live-miami-rooftop-sessions-2025" class="set-link" target="_blank" rel="noopener" title="Cosmic Gate"><svg><use href="#i-sc"/></svg></a></span></span></td>
+          <td class="pick-stage c2">Area Two</td>
+        </tr>
+        <tr>
+          <td class="pick-time">01:00 - 02:30</td>
+          <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
+          <td class="pick-stage c1">Area One</td>
+        </tr>
+        <tr>
+          <td class="pick-time">03:00 - 04:00</td>
+          <td class="pick-artist c2"><span class="pick-cell"><span>Andrew Rayel Presents Extasia<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/andrewrayel/andrew-rayel-live-at-a-state-of-trance-2025-ahoy-rotterdam" class="set-link" target="_blank" rel="noopener" title="Andrew Rayel"><svg><use href="#i-sc"/></svg></a></span></span></td>
+          <td class="pick-stage c2">Area Two</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ==================== FRIDAY ==================== -->
+  <section class="day-section">
+    <h2>Friday 27 February</h2>
+
+    <div class="timetable-grid friday-grid timetable-desktop">
+      <!-- Headers -->
+      <div class="grid-header time-col-hdr"></div>
+      <div class="grid-header c1" style="grid-column:2">Area One</div>
+      <div class="grid-header c2" style="grid-column:3">Area Two</div>
+      <div class="grid-header c3" style="grid-column:4">Area Three<small>Hosted by Beatbox</small></div>
+
+      <!-- Time labels -->
+      <div class="time-label" style="grid-row:2/6">18:00</div>
+      <div class="time-label" style="grid-row:6/10">19:00</div>
+      <div class="time-label" style="grid-row:10/14">20:00</div>
+      <div class="time-label" style="grid-row:14/18">21:00</div>
+      <div class="time-label" style="grid-row:18/22">22:00</div>
+      <div class="time-label" style="grid-row:22/26">23:00</div>
+      <div class="time-label" style="grid-row:26/30">00:00</div>
+      <div class="time-label" style="grid-row:30/31">01:00</div>
+
+      <!-- Area One -->
+      <div class="slot a1" style="grid-row:4/10;grid-column:2">
+        <span class="slot-time">18:30 - 20:00</span>
+        <div class="slot-row"><span class="slot-artist">Ruben de Ronde<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/rubenderonde/ruben-de-ronde-live-at-ultra-music-festival-2025-asot" class="set-link" target="_blank" rel="noopener" title="Ruben de Ronde"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:10/14;grid-column:2">
+        <span class="slot-time">20:00 - 21:00</span>
+        <div class="slot-row"><span class="slot-artist">Armin van Buuren<small>Trance</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:14/18;grid-column:2">
+        <span class="slot-time">21:00 - 22:00</span>
+        <div class="slot-row"><span class="slot-artist">Armin van Buuren B2B Deep Dish<small>Trance - Progressive House</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a><a href="https://soundcloud.com/deepdish/deep-dish-essential-mix-2025" class="set-link" target="_blank" rel="noopener" title="Deep Dish"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:18/26;grid-column:2">
+        <span class="slot-time">22:00 - 00:00</span>
+        <div class="slot-row"><span class="slot-artist">Armin van Buuren 25 Years Celebration Set<small>Trance</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:26/30;grid-column:2">
+        <span class="slot-time">00:00 - 01:00</span>
+        <div class="slot-row"><span class="slot-artist">Armin van Buuren F2F Funk Tribu<small>Trance - Nu-Trance</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a><a href="https://soundcloud.com/awakenings/funk-tribu-awakenings-festival-2025" class="set-link" target="_blank" rel="noopener" title="Funk Tribu"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+
+      <!-- Area Two -->
+      <div class="slot a2" style="grid-row:6/10;grid-column:3">
+        <span class="slot-time">19:00 - 20:00</span>
+        <div class="slot-row"><span class="slot-artist">Estiva<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/estiva-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Estiva"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:10/14;grid-column:3">
+        <span class="slot-time">20:00 - 21:00</span>
+        <div class="slot-row"><span class="slot-artist">Superstrings<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/superstrings2000/live-at-a-state-of-trance-london-mainstage-2025" class="set-link" target="_blank" rel="noopener" title="Superstrings"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:14/18;grid-column:3">
+        <span class="slot-time">21:00 - 22:00</span>
+        <div class="slot-row"><span class="slot-artist">Aly &amp; Fila<small>Uplifting Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/alyandfila/ds2025" class="set-link" target="_blank" rel="noopener" title="Aly &amp; Fila"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:18/22;grid-column:3">
+        <span class="slot-time">22:00 - 23:00</span>
+        <div class="slot-row"><span class="slot-artist">Ferry Corsten<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/unitedmusicevents/ferry-corsten-pres-gouryella-live-transmission-netherlands-2025" class="set-link" target="_blank" rel="noopener" title="Ferry Corsten"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:22/26;grid-column:3">
+        <span class="slot-time">23:00 - 00:00</span>
+        <div class="slot-row"><span class="slot-artist">Giuseppe Ottaviani<small>Uplifting Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/giuseppeottaviani/giuseppe-ottaviani-3h-horizons-liberation-london-2025" class="set-link" target="_blank" rel="noopener" title="Giuseppe Ottaviani"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:26/30;grid-column:3">
+        <span class="slot-time">00:00 - 01:00</span>
+        <div class="slot-row"><span class="slot-artist">John O&rsquo;Callaghan<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/john-o-callaghan-luminosity-ade-2025-2" class="set-link" target="_blank" rel="noopener" title="John O'Callaghan"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+
+      <!-- Area Three -->
+      <div class="slot a3" style="grid-row:6/10;grid-column:4">
+        <span class="slot-time">19:00 - 20:00</span>
+        <div class="slot-row"><span class="slot-artist">Sarah de Warren<small>Vocal Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/sarah-de-warren/sarah-de-warren-at-groove-cruise-2025" class="set-link" target="_blank" rel="noopener" title="Sarah de Warren"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:10/14;grid-column:4">
+        <span class="slot-time">20:00 - 21:00</span>
+        <div class="slot-row"><span class="slot-artist">Luvstruck<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/luvstruckmusic/summer-sessions-mixed-by-luvstruck" class="set-link" target="_blank" rel="noopener" title="Luvstruck"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:14/18;grid-column:4">
+        <span class="slot-time">21:00 - 22:00</span>
+        <div class="slot-row"><span class="slot-artist">NRG2000<small>Uplifting Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/rubenderonde/nrg2000-ruben-de-ronde-pres-live-at-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="NRG2000"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:18/22;grid-column:4">
+        <span class="slot-time">22:00 - 23:00</span>
+        <div class="slot-row"><span class="slot-artist">Mauro Picotto<small>Hard Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/mauro-picotto-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Mauro Picotto"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:22/26;grid-column:4">
+        <span class="slot-time">23:00 - 00:00</span>
+        <div class="slot-row"><span class="slot-artist">Will Atkinson<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/willatkinson/willatkinsondoofinthepark" class="set-link" target="_blank" rel="noopener" title="Will Atkinson"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:26/30;grid-column:4">
+        <span class="slot-time">00:00 - 01:00</span>
+        <div class="slot-row"><span class="slot-artist">Matty Ralph<small>Hard Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/matty-ralphmusic/matty-ralph-live-a-state-of-trance-rotterdam-2025" class="set-link" target="_blank" rel="noopener" title="Matty Ralph"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+    </div>
+
+    <!-- Friday Mobile -->
+    <div class="timetable-mobile">
+      <div class="mobile-area">
+        <h3 style="color:var(--area1)">Area One</h3>
+        <div class="mobile-slot a1"><span class="mobile-time">18:30 - 20:00</span><span class="mobile-wrap"><span class="mobile-artist">Ruben de Ronde<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/rubenderonde/ruben-de-ronde-live-at-ultra-music-festival-2025-asot" class="set-link" target="_blank" rel="noopener" title="Ruben de Ronde"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">20:00 - 21:00</span><span class="mobile-wrap"><span class="mobile-artist">Armin van Buuren<small>Trance</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">21:00 - 22:00</span><span class="mobile-wrap"><span class="mobile-artist">Armin van Buuren B2B Deep Dish<small>Trance - Progressive House</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a><a href="https://soundcloud.com/deepdish/deep-dish-essential-mix-2025" class="set-link" target="_blank" rel="noopener" title="Deep Dish"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">22:00 - 00:00</span><span class="mobile-wrap"><span class="mobile-artist">Armin van Buuren 25 Years Celebration Set<small>Trance</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">00:00 - 01:00</span><span class="mobile-wrap"><span class="mobile-artist">Armin van Buuren F2F Funk Tribu<small>Trance - Nu-Trance</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a><a href="https://soundcloud.com/awakenings/funk-tribu-awakenings-festival-2025" class="set-link" target="_blank" rel="noopener" title="Funk Tribu"><svg><use href="#i-sc"/></svg></a></span></span></div>
+      </div>
+      <div class="mobile-area">
+        <h3 style="color:var(--area2)">Area Two</h3>
+        <div class="mobile-slot a2"><span class="mobile-time">19:00 - 20:00</span><span class="mobile-wrap"><span class="mobile-artist">Estiva<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/estiva-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Estiva"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">20:00 - 21:00</span><span class="mobile-wrap"><span class="mobile-artist">Superstrings<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/superstrings2000/live-at-a-state-of-trance-london-mainstage-2025" class="set-link" target="_blank" rel="noopener" title="Superstrings"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">21:00 - 22:00</span><span class="mobile-wrap"><span class="mobile-artist">Aly &amp; Fila<small>Uplifting Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/alyandfila/ds2025" class="set-link" target="_blank" rel="noopener" title="Aly &amp; Fila"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">22:00 - 23:00</span><span class="mobile-wrap"><span class="mobile-artist">Ferry Corsten<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/unitedmusicevents/ferry-corsten-pres-gouryella-live-transmission-netherlands-2025" class="set-link" target="_blank" rel="noopener" title="Ferry Corsten"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">23:00 - 00:00</span><span class="mobile-wrap"><span class="mobile-artist">Giuseppe Ottaviani<small>Uplifting Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/giuseppeottaviani/giuseppe-ottaviani-3h-horizons-liberation-london-2025" class="set-link" target="_blank" rel="noopener" title="Giuseppe Ottaviani"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">00:00 - 01:00</span><span class="mobile-wrap"><span class="mobile-artist">John O&rsquo;Callaghan<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/john-o-callaghan-luminosity-ade-2025-2" class="set-link" target="_blank" rel="noopener" title="John O'Callaghan"><svg><use href="#i-sc"/></svg></a></span></span></div>
+      </div>
+      <div class="mobile-area">
+        <h3 style="color:var(--area3)">Area Three <small>Hosted by Beatbox</small></h3>
+        <div class="mobile-slot a3"><span class="mobile-time">19:00 - 20:00</span><span class="mobile-wrap"><span class="mobile-artist">Sarah de Warren<small>Vocal Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/sarah-de-warren/sarah-de-warren-at-groove-cruise-2025" class="set-link" target="_blank" rel="noopener" title="Sarah de Warren"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">20:00 - 21:00</span><span class="mobile-wrap"><span class="mobile-artist">Luvstruck<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/luvstruckmusic/summer-sessions-mixed-by-luvstruck" class="set-link" target="_blank" rel="noopener" title="Luvstruck"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">21:00 - 22:00</span><span class="mobile-wrap"><span class="mobile-artist">NRG2000<small>Uplifting Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/rubenderonde/nrg2000-ruben-de-ronde-pres-live-at-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="NRG2000"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">22:00 - 23:00</span><span class="mobile-wrap"><span class="mobile-artist">Mauro Picotto<small>Hard Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/mauro-picotto-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Mauro Picotto"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">23:00 - 00:00</span><span class="mobile-wrap"><span class="mobile-artist">Will Atkinson<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/willatkinson/willatkinsondoofinthepark" class="set-link" target="_blank" rel="noopener" title="Will Atkinson"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">00:00 - 01:00</span><span class="mobile-wrap"><span class="mobile-artist">Matty Ralph<small>Hard Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/matty-ralphmusic/matty-ralph-live-a-state-of-trance-rotterdam-2025" class="set-link" target="_blank" rel="noopener" title="Matty Ralph"><svg><use href="#i-sc"/></svg></a></span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SATURDAY ==================== -->
+  <section class="day-section">
+    <h2>Saturday 28 February</h2>
+
+    <div class="timetable-grid saturday-grid timetable-desktop">
+      <!-- Headers -->
+      <div class="grid-header time-col-hdr"></div>
+      <div class="grid-header c1" style="grid-column:2">Area One</div>
+      <div class="grid-header c2" style="grid-column:3">Area Two</div>
+      <div class="grid-header c3" style="grid-column:4">Area Three<small>Hosted by Beatbox</small></div>
+      <div class="grid-header c4" style="grid-column:5">Area Four</div>
+      <div class="grid-header c5" style="grid-column:6">Area Five</div>
+
+      <!-- Time labels -->
+      <div class="time-label" style="grid-row:2/6">21:00</div>
+      <div class="time-label" style="grid-row:6/10">22:00</div>
+      <div class="time-label" style="grid-row:10/14">23:00</div>
+      <div class="time-label" style="grid-row:14/18">00:00</div>
+      <div class="time-label" style="grid-row:18/22">01:00</div>
+      <div class="time-label" style="grid-row:22/26">02:00</div>
+      <div class="time-label" style="grid-row:26/30">03:00</div>
+      <div class="time-label" style="grid-row:30/34">04:00</div>
+      <div class="time-label" style="grid-row:34/38">05:00</div>
+      <div class="time-label" style="grid-row:38/39">06:00</div>
+
+      <!-- Area One -->
+      <div class="slot a1" style="grid-row:2/6;grid-column:2">
+        <span class="slot-time">21:00 - 22:00</span>
+        <div class="slot-row"><span class="slot-artist">Avalan Rokston<small>Melodic Techno</small></span><span class="slot-links"><a href="https://soundcloud.com/avalan-rokston/avalan-rokston-tomorrowland-freedom-stage-2025" class="set-link" target="_blank" rel="noopener" title="Avalan Rokston"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:6/10;grid-column:2">
+        <span class="slot-time">22:00 - 23:00</span>
+        <div class="slot-row"><span class="slot-artist">Joa<small>Trance</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:10/14;grid-column:2">
+        <span class="slot-time">23:00 - 00:00</span>
+        <div class="slot-row"><span class="slot-artist">Korolova<small>Melodic Techno</small></span><span class="slot-links"><a href="https://soundcloud.com/korolovadj/korolova-live-tomorrowland" class="set-link" target="_blank" rel="noopener" title="Korolova"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:14/18;grid-column:2">
+        <span class="slot-time">00:00 - 01:00</span>
+        <div class="slot-row"><span class="slot-artist">Benwal<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/dgtl-festival/benwal-full-set-dgtl-ade-2025-231025" class="set-link" target="_blank" rel="noopener" title="Benwal"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:18/24;grid-column:2">
+        <span class="slot-time">01:00 - 02:30</span>
+        <div class="slot-row"><span class="slot-artist">Armin van Buuren<small>Trance</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:24/28;grid-column:2">
+        <span class="slot-time">02:30 - 03:30</span>
+        <div class="slot-row"><span class="slot-artist">Armin van Buuren B3B Oliver Heldens B3B Maddix<small>Trance - House - Big Room</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a><a href="https://soundcloud.com/heldeepradio/oliver-heldens-heldeep-radio-600" class="set-link" target="_blank" rel="noopener" title="Oliver Heldens"><svg><use href="#i-sc"/></svg></a><a href="https://soundcloud.com/maddixmusic/maddix-live-edc-las-vegas-2025-circuitgrounds" class="set-link" target="_blank" rel="noopener" title="Maddix"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:28/33;grid-column:2">
+        <span class="slot-time">03:30 - 04:45</span>
+        <div class="slot-row"><span class="slot-artist">Hannah Laing<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/hannahlaingdj/hannah-laing-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Hannah Laing"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a1" style="grid-row:33/38;grid-column:2">
+        <span class="slot-time">04:45 - 06:00</span>
+        <div class="slot-row"><span class="slot-artist">Nifra<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/nifra/ultra2025" class="set-link" target="_blank" rel="noopener" title="Nifra"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+
+      <!-- Area Two -->
+      <div class="slot a2" style="grid-row:2/6;grid-column:3">
+        <span class="slot-time">21:00 - 22:00</span>
+        <div class="slot-row"><span class="slot-artist">Ginchy<small>Melodic House</small></span><span class="slot-links"><a href="https://soundcloud.com/iamginchy/ants-next-gen-mix-by-ginchy" class="set-link" target="_blank" rel="noopener" title="Ginchy"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:6/10;grid-column:3">
+        <span class="slot-time">22:00 - 23:00</span>
+        <div class="slot-row"><span class="slot-artist">Laura van Dam<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/capturerecords/capture-radio-072" class="set-link" target="_blank" rel="noopener" title="Laura van Dam"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:10/14;grid-column:3">
+        <span class="slot-time">23:00 - 00:00</span>
+        <div class="slot-row"><span class="slot-artist">Ottagon<small>Melodic Techno</small></span><span class="slot-links"><a href="https://soundcloud.com/giuseppeottaviani/ottagon-live-at-dreamstate-europe-on-12th-april-2025" class="set-link" target="_blank" rel="noopener" title="Ottagon"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:14/18;grid-column:3">
+        <span class="slot-time">00:00 - 01:00</span>
+        <div class="slot-row"><span class="slot-artist">Cosmic Gate<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/1001tracklists/cosmic-gate-live-miami-rooftop-sessions-2025" class="set-link" target="_blank" rel="noopener" title="Cosmic Gate"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:18/22;grid-column:3">
+        <span class="slot-time">01:00 - 02:00</span>
+        <div class="slot-row"><span class="slot-artist">Billy Gillies<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/oceanologyofc/billy-gillies-live-at" class="set-link" target="_blank" rel="noopener" title="Billy Gillies"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:22/26;grid-column:3">
+        <span class="slot-time">02:00 - 03:00</span>
+        <div class="slot-row"><span class="slot-artist">Marlo<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/marlomusic/altitude-radio-episode-181" class="set-link" target="_blank" rel="noopener" title="Marlo"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:26/30;grid-column:3">
+        <span class="slot-time">03:00 - 04:00</span>
+        <div class="slot-row"><span class="slot-artist">Andrew Rayel Presents Extasia<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/andrewrayel/andrew-rayel-live-at-a-state-of-trance-2025-ahoy-rotterdam" class="set-link" target="_blank" rel="noopener" title="Andrew Rayel"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:30/34;grid-column:3">
+        <span class="slot-time">04:00 - 05:00</span>
+        <div class="slot-row"><span class="slot-artist">Richard Durand<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/richard-durand-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Richard Durand"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a2" style="grid-row:34/38;grid-column:3">
+        <span class="slot-time">05:00 - 06:00</span>
+        <div class="slot-row"><span class="slot-artist">David Forbes<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/djdavidforbes/david-forbes-void-stage-dreamstate-25" class="set-link" target="_blank" rel="noopener" title="David Forbes"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+
+      <!-- Area Three -->
+      <div class="slot a3" style="grid-row:6/11;grid-column:4">
+        <span class="slot-time">22:00 - 23:15</span>
+        <div class="slot-row"><span class="slot-artist">Olivia Lensen<small>House</small></span><span class="slot-links"><a href="https://soundcloud.com/thebeat3fm/the-beat-mix-olivia-lensen" class="set-link" target="_blank" rel="noopener" title="Olivia Lensen"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:11/16;grid-column:4">
+        <span class="slot-time">23:15 - 00:30</span>
+        <div class="slot-row"><span class="slot-artist">Newtone<small>House</small></span><span class="slot-links"><a href="https://soundcloud.com/newtoneamsterdam/newtone-thuishaven-27-07-2025" class="set-link" target="_blank" rel="noopener" title="Newtone"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:16/21;grid-column:4">
+        <span class="slot-time">00:30 - 01:45</span>
+        <div class="slot-row"><span class="slot-artist">Dart B2B Inafekt<small>Techno - Tech House</small></span><span class="slot-links"><span class="set-link no-link" title="Dart: no set found"><svg><use href="#i-no"/></svg></span><a href="https://soundcloud.com/inafekt/inafekt-shelter-amsterdam-13th-september-2025" class="set-link" target="_blank" rel="noopener" title="Inafekt"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:21/26;grid-column:4">
+        <span class="slot-time">01:45 - 03:00</span>
+        <div class="slot-row"><span class="slot-artist">Tjade<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/zeezout/tjade-at-zeezout-festival-2025" class="set-link" target="_blank" rel="noopener" title="Tjade"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:26/31;grid-column:4">
+        <span class="slot-time">03:00 - 04:15</span>
+        <div class="slot-row"><span class="slot-artist">Lawton<small>Techno</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></div>
+      </div>
+      <div class="slot a3" style="grid-row:31/36;grid-column:4">
+        <span class="slot-time">04:15 - 05:30</span>
+        <div class="slot-row"><span class="slot-artist">Ammara<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/6amgroup/guest-mix-ammara" class="set-link" target="_blank" rel="noopener" title="Ammara"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+
+      <!-- Area Four -->
+      <div class="slot a4" style="grid-row:2/6;grid-column:5">
+        <span class="slot-time">21:00 - 22:00</span>
+        <div class="slot-row"><span class="slot-artist">Kyau &amp; Albert<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/euphonicsessions/euphonic-sessions-december2025" class="set-link" target="_blank" rel="noopener" title="Kyau &amp; Albert"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a4" style="grid-row:6/10;grid-column:5">
+        <span class="slot-time">22:00 - 23:00</span>
+        <div class="slot-row"><span class="slot-artist">Super8 &amp; Tab<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/super8tab/sets/supertab-radio" class="set-link" target="_blank" rel="noopener" title="Super8 &amp; Tab"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a4" style="grid-row:10/14;grid-column:5">
+        <span class="slot-time">23:00 - 00:00</span>
+        <div class="slot-row"><span class="slot-artist">Rank 1<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/rank-1-luminosity-beach" class="set-link" target="_blank" rel="noopener" title="Rank 1"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a4" style="grid-row:14/18;grid-column:5">
+        <span class="slot-time">00:00 - 01:00</span>
+        <div class="slot-row"><span class="slot-artist">&Oslash;rjan Nilsen<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/orjan_nilsen/orjan-nilsen-dreamstate-mix-insomniaccom" class="set-link" target="_blank" rel="noopener" title="&Oslash;rjan Nilsen"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a4" style="grid-row:18/22;grid-column:5">
+        <span class="slot-time">01:00 - 02:00</span>
+        <div class="slot-row"><span class="slot-artist">Jorn van Deynhoven<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/jornvandeynhoven/jorn-van-deynhoven-dj-mix-june" class="set-link" target="_blank" rel="noopener" title="Jorn van Deynhoven"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a4" style="grid-row:22/26;grid-column:5">
+        <span class="slot-time">02:00 - 03:00</span>
+        <div class="slot-row"><span class="slot-artist">Push<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/push-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Push"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a4" style="grid-row:26/30;grid-column:5">
+        <span class="slot-time">03:00 - 04:00</span>
+        <div class="slot-row"><span class="slot-artist">Sean Tyas<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/seantyas/sean-tyas-live-at-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Sean Tyas"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a4" style="grid-row:30/34;grid-column:5">
+        <span class="slot-time">04:00 - 05:00</span>
+        <div class="slot-row"><span class="slot-artist">Signum<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/singum-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Signum"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+
+      <!-- Area Five -->
+      <div class="slot a5" style="grid-row:6/10;grid-column:6">
+        <span class="slot-time">22:00 - 23:00</span>
+        <div class="slot-row"><span class="slot-artist">Amber Revival<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/amber-revival/hidden-light-radioshow-006-by-amber-revival-hl006" class="set-link" target="_blank" rel="noopener" title="Amber Revival"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a5" style="grid-row:10/14;grid-column:6">
+        <span class="slot-time">23:00 - 00:00</span>
+        <div class="slot-row"><span class="slot-artist">Jesabel<small>Melodic Techno</small></span><span class="slot-links"><a href="https://soundcloud.com/jesabeldj/jesabel-live-a-state-of-trance-london-2025" class="set-link" target="_blank" rel="noopener" title="Jesabel"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a5" style="grid-row:14/18;grid-column:6">
+        <span class="slot-time">00:00 - 01:00</span>
+        <div class="slot-row"><span class="slot-artist">J Ribbon<small>Progressive House</small></span><span class="slot-links"><a href="https://soundcloud.com/jribbon/j-ribbon-live-at-o2-academy-brixton-november-15-2025" class="set-link" target="_blank" rel="noopener" title="J Ribbon"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a5" style="grid-row:18/22;grid-column:6">
+        <span class="slot-time">01:00 - 02:00</span>
+        <div class="slot-row"><span class="slot-artist">Ebenezer<small>Tech Trance</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></div>
+      </div>
+      <div class="slot a5" style="grid-row:22/26;grid-column:6">
+        <span class="slot-time">02:00 - 03:00</span>
+        <div class="slot-row"><span class="slot-artist">Matt Fax<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/enhancedprogressive/best-of-enhanced-progressive-2025-mixed-by-matt-fax" class="set-link" target="_blank" rel="noopener" title="Matt Fax"><svg><use href="#i-sc"/></svg></a></span></div>
+      </div>
+      <div class="slot a5" style="grid-row:26/30;grid-column:6">
+        <span class="slot-time">03:00 - 04:00</span>
+        <div class="slot-row"><span class="slot-artist">Dan Sushi<small>Progressive House</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></div>
+      </div>
+      <div class="slot a5" style="grid-row:30/34;grid-column:6">
+        <span class="slot-time">04:00 - 05:00</span>
+        <div class="slot-row"><span class="slot-artist">Mrphlndr<small>Deep Trance</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></div>
+      </div>
+    </div>
+
+    <!-- Saturday Mobile -->
+    <div class="timetable-mobile">
+      <div class="mobile-area">
+        <h3 style="color:var(--area1)">Area One</h3>
+        <div class="mobile-slot a1"><span class="mobile-time">21:00 - 22:00</span><span class="mobile-wrap"><span class="mobile-artist">Avalan Rokston<small>Melodic Techno</small></span><span class="slot-links"><a href="https://soundcloud.com/avalan-rokston/avalan-rokston-tomorrowland-freedom-stage-2025" class="set-link" target="_blank" rel="noopener" title="Avalan Rokston"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">22:00 - 23:00</span><span class="mobile-wrap"><span class="mobile-artist">Joa<small>Trance</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">23:00 - 00:00</span><span class="mobile-wrap"><span class="mobile-artist">Korolova<small>Melodic Techno</small></span><span class="slot-links"><a href="https://soundcloud.com/korolovadj/korolova-live-tomorrowland" class="set-link" target="_blank" rel="noopener" title="Korolova"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">00:00 - 01:00</span><span class="mobile-wrap"><span class="mobile-artist">Benwal<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/dgtl-festival/benwal-full-set-dgtl-ade-2025-231025" class="set-link" target="_blank" rel="noopener" title="Benwal"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">01:00 - 02:30</span><span class="mobile-wrap"><span class="mobile-artist">Armin van Buuren<small>Trance</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">02:30 - 03:30</span><span class="mobile-wrap"><span class="mobile-artist">Armin van Buuren B3B Oliver Heldens B3B Maddix<small>Trance - House - Big Room</small></span><span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a><a href="https://soundcloud.com/heldeepradio/oliver-heldens-heldeep-radio-600" class="set-link" target="_blank" rel="noopener" title="Oliver Heldens"><svg><use href="#i-sc"/></svg></a><a href="https://soundcloud.com/maddixmusic/maddix-live-edc-las-vegas-2025-circuitgrounds" class="set-link" target="_blank" rel="noopener" title="Maddix"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">03:30 - 04:45</span><span class="mobile-wrap"><span class="mobile-artist">Hannah Laing<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/hannahlaingdj/hannah-laing-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Hannah Laing"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a1"><span class="mobile-time">04:45 - 06:00</span><span class="mobile-wrap"><span class="mobile-artist">Nifra<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/nifra/ultra2025" class="set-link" target="_blank" rel="noopener" title="Nifra"><svg><use href="#i-sc"/></svg></a></span></span></div>
+      </div>
+      <div class="mobile-area">
+        <h3 style="color:var(--area2)">Area Two</h3>
+        <div class="mobile-slot a2"><span class="mobile-time">21:00 - 22:00</span><span class="mobile-wrap"><span class="mobile-artist">Ginchy<small>Melodic House</small></span><span class="slot-links"><a href="https://soundcloud.com/iamginchy/ants-next-gen-mix-by-ginchy" class="set-link" target="_blank" rel="noopener" title="Ginchy"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">22:00 - 23:00</span><span class="mobile-wrap"><span class="mobile-artist">Laura van Dam<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/capturerecords/capture-radio-072" class="set-link" target="_blank" rel="noopener" title="Laura van Dam"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">23:00 - 00:00</span><span class="mobile-wrap"><span class="mobile-artist">Ottagon<small>Melodic Techno</small></span><span class="slot-links"><a href="https://soundcloud.com/giuseppeottaviani/ottagon-live-at-dreamstate-europe-on-12th-april-2025" class="set-link" target="_blank" rel="noopener" title="Ottagon"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">00:00 - 01:00</span><span class="mobile-wrap"><span class="mobile-artist">Cosmic Gate<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/1001tracklists/cosmic-gate-live-miami-rooftop-sessions-2025" class="set-link" target="_blank" rel="noopener" title="Cosmic Gate"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">01:00 - 02:00</span><span class="mobile-wrap"><span class="mobile-artist">Billy Gillies<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/oceanologyofc/billy-gillies-live-at" class="set-link" target="_blank" rel="noopener" title="Billy Gillies"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">02:00 - 03:00</span><span class="mobile-wrap"><span class="mobile-artist">Marlo<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/marlomusic/altitude-radio-episode-181" class="set-link" target="_blank" rel="noopener" title="Marlo"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">03:00 - 04:00</span><span class="mobile-wrap"><span class="mobile-artist">Andrew Rayel Presents Extasia<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/andrewrayel/andrew-rayel-live-at-a-state-of-trance-2025-ahoy-rotterdam" class="set-link" target="_blank" rel="noopener" title="Andrew Rayel"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">04:00 - 05:00</span><span class="mobile-wrap"><span class="mobile-artist">Richard Durand<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/richard-durand-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Richard Durand"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a2"><span class="mobile-time">05:00 - 06:00</span><span class="mobile-wrap"><span class="mobile-artist">David Forbes<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/djdavidforbes/david-forbes-void-stage-dreamstate-25" class="set-link" target="_blank" rel="noopener" title="David Forbes"><svg><use href="#i-sc"/></svg></a></span></span></div>
+      </div>
+      <div class="mobile-area">
+        <h3 style="color:var(--area3)">Area Three <small>Hosted by Beatbox</small></h3>
+        <div class="mobile-slot a3"><span class="mobile-time">22:00 - 23:15</span><span class="mobile-wrap"><span class="mobile-artist">Olivia Lensen<small>House</small></span><span class="slot-links"><a href="https://soundcloud.com/thebeat3fm/the-beat-mix-olivia-lensen" class="set-link" target="_blank" rel="noopener" title="Olivia Lensen"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">23:15 - 00:30</span><span class="mobile-wrap"><span class="mobile-artist">Newtone<small>House</small></span><span class="slot-links"><a href="https://soundcloud.com/newtoneamsterdam/newtone-thuishaven-27-07-2025" class="set-link" target="_blank" rel="noopener" title="Newtone"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">00:30 - 01:45</span><span class="mobile-wrap"><span class="mobile-artist">Dart B2B Inafekt<small>Techno - Tech House</small></span><span class="slot-links"><span class="set-link no-link" title="Dart: no set found"><svg><use href="#i-no"/></svg></span><a href="https://soundcloud.com/inafekt/inafekt-shelter-amsterdam-13th-september-2025" class="set-link" target="_blank" rel="noopener" title="Inafekt"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">01:45 - 03:00</span><span class="mobile-wrap"><span class="mobile-artist">Tjade<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/zeezout/tjade-at-zeezout-festival-2025" class="set-link" target="_blank" rel="noopener" title="Tjade"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">03:00 - 04:15</span><span class="mobile-wrap"><span class="mobile-artist">Lawton<small>Techno</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></span></div>
+        <div class="mobile-slot a3"><span class="mobile-time">04:15 - 05:30</span><span class="mobile-wrap"><span class="mobile-artist">Ammara<small>Hard House</small></span><span class="slot-links"><a href="https://soundcloud.com/6amgroup/guest-mix-ammara" class="set-link" target="_blank" rel="noopener" title="Ammara"><svg><use href="#i-sc"/></svg></a></span></span></div>
+      </div>
+      <div class="mobile-area">
+        <h3 style="color:var(--area4)">Area Four</h3>
+        <div class="mobile-slot a4"><span class="mobile-time">21:00 - 22:00</span><span class="mobile-wrap"><span class="mobile-artist">Kyau &amp; Albert<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/euphonicsessions/euphonic-sessions-december2025" class="set-link" target="_blank" rel="noopener" title="Kyau &amp; Albert"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a4"><span class="mobile-time">22:00 - 23:00</span><span class="mobile-wrap"><span class="mobile-artist">Super8 &amp; Tab<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/super8tab/sets/supertab-radio" class="set-link" target="_blank" rel="noopener" title="Super8 &amp; Tab"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a4"><span class="mobile-time">23:00 - 00:00</span><span class="mobile-wrap"><span class="mobile-artist">Rank 1<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/rank-1-luminosity-beach" class="set-link" target="_blank" rel="noopener" title="Rank 1"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a4"><span class="mobile-time">00:00 - 01:00</span><span class="mobile-wrap"><span class="mobile-artist">&Oslash;rjan Nilsen<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/orjan_nilsen/orjan-nilsen-dreamstate-mix-insomniaccom" class="set-link" target="_blank" rel="noopener" title="&Oslash;rjan Nilsen"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a4"><span class="mobile-time">01:00 - 02:00</span><span class="mobile-wrap"><span class="mobile-artist">Jorn van Deynhoven<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/jornvandeynhoven/jorn-van-deynhoven-dj-mix-june" class="set-link" target="_blank" rel="noopener" title="Jorn van Deynhoven"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a4"><span class="mobile-time">02:00 - 03:00</span><span class="mobile-wrap"><span class="mobile-artist">Push<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/push-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Push"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a4"><span class="mobile-time">03:00 - 04:00</span><span class="mobile-wrap"><span class="mobile-artist">Sean Tyas<small>Tech Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/seantyas/sean-tyas-live-at-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Sean Tyas"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a4"><span class="mobile-time">04:00 - 05:00</span><span class="mobile-wrap"><span class="mobile-artist">Signum<small>Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/luminosityevents-1/singum-luminosity-beach-festival-2025" class="set-link" target="_blank" rel="noopener" title="Signum"><svg><use href="#i-sc"/></svg></a></span></span></div>
+      </div>
+      <div class="mobile-area">
+        <h3 style="color:var(--area5)">Area Five</h3>
+        <div class="mobile-slot a5"><span class="mobile-time">22:00 - 23:00</span><span class="mobile-wrap"><span class="mobile-artist">Amber Revival<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/amber-revival/hidden-light-radioshow-006-by-amber-revival-hl006" class="set-link" target="_blank" rel="noopener" title="Amber Revival"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a5"><span class="mobile-time">23:00 - 00:00</span><span class="mobile-wrap"><span class="mobile-artist">Jesabel<small>Melodic Techno</small></span><span class="slot-links"><a href="https://soundcloud.com/jesabeldj/jesabel-live-a-state-of-trance-london-2025" class="set-link" target="_blank" rel="noopener" title="Jesabel"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a5"><span class="mobile-time">00:00 - 01:00</span><span class="mobile-wrap"><span class="mobile-artist">J Ribbon<small>Progressive House</small></span><span class="slot-links"><a href="https://soundcloud.com/jribbon/j-ribbon-live-at-o2-academy-brixton-november-15-2025" class="set-link" target="_blank" rel="noopener" title="J Ribbon"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a5"><span class="mobile-time">01:00 - 02:00</span><span class="mobile-wrap"><span class="mobile-artist">Ebenezer<small>Tech Trance</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></span></div>
+        <div class="mobile-slot a5"><span class="mobile-time">02:00 - 03:00</span><span class="mobile-wrap"><span class="mobile-artist">Matt Fax<small>Progressive Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/enhancedprogressive/best-of-enhanced-progressive-2025-mixed-by-matt-fax" class="set-link" target="_blank" rel="noopener" title="Matt Fax"><svg><use href="#i-sc"/></svg></a></span></span></div>
+        <div class="mobile-slot a5"><span class="mobile-time">03:00 - 04:00</span><span class="mobile-wrap"><span class="mobile-artist">Dan Sushi<small>Progressive House</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></span></div>
+        <div class="mobile-slot a5"><span class="mobile-time">04:00 - 05:00</span><span class="mobile-wrap"><span class="mobile-artist">Mrphlndr<small>Deep Trance</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    27-28 February 2026 &middot; Ahoy Rotterdam &middot; astateoftrance.com
+  </footer>
+
+  <script>
+    // Register service worker for offline support
+    if ('serviceWorker' in navigator) {
+      var swCode = [
+        "var CACHE = 'asot-v1';",
+        "self.addEventListener('install', function(e) {",
+        "  e.waitUntil(caches.open(CACHE).then(function(c) {",
+        "    return c.addAll(['./', './index.html']);",
+        "  }));",
+        "  self.skipWaiting();",
+        "});",
+        "self.addEventListener('activate', function(e) {",
+        "  e.waitUntil(caches.keys().then(function(keys) {",
+        "    return Promise.all(keys.filter(function(k) { return k !== CACHE; }).map(function(k) { return caches.delete(k); }));",
+        "  }));",
+        "  self.clients.claim();",
+        "});",
+        "self.addEventListener('fetch', function(e) {",
+        "  e.respondWith(caches.match(e.request).then(function(r) {",
+        "    return r || fetch(e.request).then(function(resp) {",
+        "      var clone = resp.clone();",
+        "      caches.open(CACHE).then(function(c) { c.put(e.request, clone); });",
+        "      return resp;",
+        "    });",
+        "  }));",
+        "});"
+      ].join('\n');
+      var blob = new Blob([swCode], { type: 'application/javascript' });
+      navigator.serviceWorker.register(URL.createObjectURL(blob));
+    }
+
+    // Generate home-screen icon via canvas
+    (function() {
+      var c = document.createElement('canvas');
+      c.width = c.height = 180;
+      var ctx = c.getContext('2d');
+      ctx.fillStyle = '#0a0b0d';
+      ctx.fillRect(0, 0, 180, 180);
+      ctx.fillStyle = '#e8457a';
+      ctx.font = 'bold 42px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('ASOT', 90, 80);
+      ctx.fillStyle = '#555';
+      ctx.font = '18px -apple-system, sans-serif';
+      ctx.fillText('2026', 90, 115);
+      var link = document.createElement('link');
+      link.rel = 'apple-touch-icon';
+      link.href = c.toDataURL('image/png');
+      document.head.appendChild(link);
+    })();
+  </script>
+</body>
+</html>
