@@ -386,6 +386,34 @@
       .picks-table td { padding: 6px 8px; }
     }
 
+    /* ---- Map button & modal ---- */
+    #map-btn {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 4px;
+    }
+    #map-btn svg { width: 22px; height: 22px; }
+    #map-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #map-modal img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+    }
+
     /* ---- Past acts ---- */
     .slot.past, .mobile-slot.past, .picks-table tr.past td { opacity: 0.5; }
 
@@ -423,12 +451,22 @@
       <circle cx="12" cy="12" r="10"/>
       <line x1="8" y1="12" x2="16" y2="12"/>
     </symbol>
+    <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/>
+      <line x1="8" y1="2" x2="8" y2="18"/>
+      <line x1="16" y1="6" x2="16" y2="22"/>
+    </symbol>
   </svg>
 
   <div id="countdown-bar">
     <div id="cb-now" class="cb-section"></div>
     <div id="cb-next" class="cb-section"></div>
     <div class="cb-time" id="cb-time"></div>
+    <button id="map-btn" onclick="document.getElementById('map-modal').style.display='flex'" aria-label="Show map"><svg><use href="#i-map"/></svg></button>
+  </div>
+
+  <div id="map-modal" style="display:none" onclick="this.style.display='none'">
+    <img src="map.png" alt="Event map" onclick="event.stopPropagation()">
   </div>
 
   <header class="page-header">
