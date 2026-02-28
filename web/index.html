@@ -33,7 +33,46 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 24px 16px;
-      padding-top: calc(24px + env(safe-area-inset-top));
+      padding-top: 110px;
+    }
+
+    /* ---- Countdown Bar ---- */
+    #countdown-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--grid-line);
+      padding: 10px 16px;
+      padding-top: calc(10px + env(safe-area-inset-top));
+      text-align: center;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    #countdown-bar .cb-label {
+      color: var(--text-dim);
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      margin-bottom: 2px;
+    }
+    #countdown-bar .cb-details {
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+    }
+    #countdown-bar .cb-time {
+      color: #fff;
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    #countdown-bar .cb-sep {
+      color: var(--text-dim);
+      margin: 0 6px;
     }
 
     /* ---- Header ---- */
@@ -68,6 +107,55 @@
       padding-bottom: 8px;
       border-bottom: 1px solid var(--grid-line);
     }
+
+    /* ---- Collapsible sections ---- */
+    details.collapsible { margin-bottom: 48px; }
+    details.collapsible summary {
+      color: #fff;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--grid-line);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    details.collapsible summary::-webkit-details-marker { display: none; }
+    details.collapsible summary::after {
+      content: '+';
+      margin-left: auto;
+      font-size: 1.2rem;
+      color: var(--text-dim);
+      transition: transform 0.2s;
+    }
+    details.collapsible[open] summary::after { content: '\2212'; }
+    details.collapsible .section-content { padding-top: 16px; }
+    details.collapsible-sub { margin-bottom: 24px; }
+    details.collapsible-sub summary {
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 12px 0 6px;
+      border-bottom: 1px solid var(--grid-line);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+    details.collapsible-sub summary::-webkit-details-marker { display: none; }
+    details.collapsible-sub summary::after {
+      content: '+';
+      margin-left: auto;
+      font-size: 1rem;
+      color: var(--text-dim);
+    }
+    details.collapsible-sub[open] summary::after { content: '\2212'; }
 
     /* ---- My Picks ---- */
     .picks-section { margin-bottom: 48px; }
@@ -320,78 +408,94 @@
     </symbol>
   </svg>
 
+  <div id="countdown-bar">
+    <div class="cb-label" id="cb-label">Next up</div>
+    <div class="cb-details" id="cb-details"></div>
+    <div class="cb-time" id="cb-time"></div>
+  </div>
+
   <header class="page-header">
     <h1>ASOT 2026</h1>
     <p class="subtitle">Celebrating 25 Years &middot; Ahoy Rotterdam &middot; 27-28 February</p>
   </header>
 
   <!-- ==================== MY PICKS ==================== -->
-  <section class="picks-section">
-    <h2>My Picks</h2>
-    <table class="picks-table">
-      <thead>
-        <tr><th>Time</th><th>Artist</th><th>Stage</th></tr>
-      </thead>
-      <tbody>
-        <tr class="day-divider"><td colspan="3">Friday 27 February</td></tr>
-        <tr class="secondary">
-          <td class="pick-time">18:30 - 20:00</td>
-          <td class="pick-artist c1"><span class="pick-cell"><span>Ruben de Ronde<small>Progressive Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/rubenderonde/ruben-de-ronde-live-at-ultra-music-festival-2025-asot" class="set-link" target="_blank" rel="noopener" title="Ruben de Ronde"><svg><use href="#i-sc"/></svg></a></span></span></td>
-          <td class="pick-stage c1">Area One</td>
-        </tr>
-        <tr>
-          <td class="pick-time">20:00 - 21:00</td>
-          <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
-          <td class="pick-stage c1">Area One</td>
-        </tr>
-        <tr>
-          <td class="pick-time">21:00 - 22:00</td>
-          <td class="pick-artist c2"><span class="pick-cell"><span>Aly &amp; Fila<small>Uplifting Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/alyandfila/ds2025" class="set-link" target="_blank" rel="noopener" title="Aly &amp; Fila"><svg><use href="#i-sc"/></svg></a></span></span></td>
-          <td class="pick-stage c2">Area Two</td>
-        </tr>
-        <tr>
-          <td class="pick-time">22:00 - 00:00</td>
-          <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren 25 Years Celebration Set<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
-          <td class="pick-stage c1">Area One</td>
-        </tr>
-        <tr class="day-divider"><td colspan="3">Saturday 28 February</td></tr>
-        <tr>
-          <td class="pick-time">21:00 - 22:00</td>
-          <td class="pick-artist c4"><span class="pick-cell"><span>Kyau &amp; Albert<small>Progressive Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/euphonicsessions/euphonic-sessions-december2025" class="set-link" target="_blank" rel="noopener" title="Kyau &amp; Albert"><svg><use href="#i-sc"/></svg></a></span></span></td>
-          <td class="pick-stage c4">Area Four</td>
-        </tr>
-        <tr>
-          <td class="pick-time">22:00 - 23:00</td>
-          <td class="pick-artist c4"><span class="pick-cell"><span>Super8 &amp; Tab<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/super8tab/sets/supertab-radio" class="set-link" target="_blank" rel="noopener" title="Super8 &amp; Tab"><svg><use href="#i-sc"/></svg></a></span></span></td>
-          <td class="pick-stage c4">Area Four</td>
-        </tr>
-        <tr>
-          <td class="pick-time">23:00 - 00:00</td>
-          <td class="pick-artist c2"><span class="pick-cell"><span>Ottagon<small>Melodic Techno</small></span> <span class="slot-links"><a href="https://soundcloud.com/giuseppeottaviani/ottagon-live-at-dreamstate-europe-on-12th-april-2025" class="set-link" target="_blank" rel="noopener" title="Ottagon"><svg><use href="#i-sc"/></svg></a></span></span></td>
-          <td class="pick-stage c2">Area Two</td>
-        </tr>
-        <tr>
-          <td class="pick-time">00:00 - 01:00</td>
-          <td class="pick-artist c2"><span class="pick-cell"><span>Cosmic Gate<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/1001tracklists/cosmic-gate-live-miami-rooftop-sessions-2025" class="set-link" target="_blank" rel="noopener" title="Cosmic Gate"><svg><use href="#i-sc"/></svg></a></span></span></td>
-          <td class="pick-stage c2">Area Two</td>
-        </tr>
-        <tr>
-          <td class="pick-time">01:00 - 02:30</td>
-          <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
-          <td class="pick-stage c1">Area One</td>
-        </tr>
-        <tr>
-          <td class="pick-time">03:00 - 04:00</td>
-          <td class="pick-artist c2"><span class="pick-cell"><span>Andrew Rayel Presents Extasia<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/andrewrayel/andrew-rayel-live-at-a-state-of-trance-2025-ahoy-rotterdam" class="set-link" target="_blank" rel="noopener" title="Andrew Rayel"><svg><use href="#i-sc"/></svg></a></span></span></td>
-          <td class="pick-stage c2">Area Two</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
+  <details class="collapsible picks-section" open>
+    <summary>My Picks</summary>
+    <div class="section-content">
+      <details class="collapsible-sub">
+        <summary>Friday 27 February</summary>
+        <table class="picks-table">
+          <thead><tr><th>Time</th><th>Artist</th><th>Stage</th></tr></thead>
+          <tbody>
+            <tr class="secondary">
+              <td class="pick-time">18:30 - 20:00</td>
+              <td class="pick-artist c1"><span class="pick-cell"><span>Ruben de Ronde<small>Progressive Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/rubenderonde/ruben-de-ronde-live-at-ultra-music-festival-2025-asot" class="set-link" target="_blank" rel="noopener" title="Ruben de Ronde"><svg><use href="#i-sc"/></svg></a></span></span></td>
+              <td class="pick-stage c1">Area One</td>
+            </tr>
+            <tr>
+              <td class="pick-time">20:00 - 21:00</td>
+              <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
+              <td class="pick-stage c1">Area One</td>
+            </tr>
+            <tr>
+              <td class="pick-time">21:00 - 22:00</td>
+              <td class="pick-artist c2"><span class="pick-cell"><span>Aly &amp; Fila<small>Uplifting Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/alyandfila/ds2025" class="set-link" target="_blank" rel="noopener" title="Aly &amp; Fila"><svg><use href="#i-sc"/></svg></a></span></span></td>
+              <td class="pick-stage c2">Area Two</td>
+            </tr>
+            <tr>
+              <td class="pick-time">22:00 - 00:00</td>
+              <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren 25 Years Celebration Set<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
+              <td class="pick-stage c1">Area One</td>
+            </tr>
+          </tbody>
+        </table>
+      </details>
+      <details class="collapsible-sub" open>
+        <summary>Saturday 28 February</summary>
+        <table class="picks-table">
+          <thead><tr><th>Time</th><th>Artist</th><th>Stage</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="pick-time">21:00 - 22:00</td>
+              <td class="pick-artist c4"><span class="pick-cell"><span>Kyau &amp; Albert<small>Progressive Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/euphonicsessions/euphonic-sessions-december2025" class="set-link" target="_blank" rel="noopener" title="Kyau &amp; Albert"><svg><use href="#i-sc"/></svg></a></span></span></td>
+              <td class="pick-stage c4">Area Four</td>
+            </tr>
+            <tr>
+              <td class="pick-time">22:00 - 23:00</td>
+              <td class="pick-artist c4"><span class="pick-cell"><span>Super8 &amp; Tab<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/super8tab/sets/supertab-radio" class="set-link" target="_blank" rel="noopener" title="Super8 &amp; Tab"><svg><use href="#i-sc"/></svg></a></span></span></td>
+              <td class="pick-stage c4">Area Four</td>
+            </tr>
+            <tr>
+              <td class="pick-time">23:00 - 00:00</td>
+              <td class="pick-artist c2"><span class="pick-cell"><span>Ottagon<small>Melodic Techno</small></span> <span class="slot-links"><a href="https://soundcloud.com/giuseppeottaviani/ottagon-live-at-dreamstate-europe-on-12th-april-2025" class="set-link" target="_blank" rel="noopener" title="Ottagon"><svg><use href="#i-sc"/></svg></a></span></span></td>
+              <td class="pick-stage c2">Area Two</td>
+            </tr>
+            <tr>
+              <td class="pick-time">00:00 - 01:00</td>
+              <td class="pick-artist c2"><span class="pick-cell"><span>Cosmic Gate<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/1001tracklists/cosmic-gate-live-miami-rooftop-sessions-2025" class="set-link" target="_blank" rel="noopener" title="Cosmic Gate"><svg><use href="#i-sc"/></svg></a></span></span></td>
+              <td class="pick-stage c2">Area Two</td>
+            </tr>
+            <tr>
+              <td class="pick-time">01:00 - 02:30</td>
+              <td class="pick-artist c1"><span class="pick-cell"><span>Armin van Buuren<small>Trance</small></span> <span class="slot-links"><a href="https://open.spotify.com/album/11hKL1GmHT30riBDSoNLoE" class="set-link" target="_blank" rel="noopener" title="Armin van Buuren"><svg><use href="#i-sp"/></svg></a></span></span></td>
+              <td class="pick-stage c1">Area One</td>
+            </tr>
+            <tr>
+              <td class="pick-time">03:00 - 04:00</td>
+              <td class="pick-artist c2"><span class="pick-cell"><span>Andrew Rayel Presents Extasia<small>Trance</small></span> <span class="slot-links"><a href="https://soundcloud.com/andrewrayel/andrew-rayel-live-at-a-state-of-trance-2025-ahoy-rotterdam" class="set-link" target="_blank" rel="noopener" title="Andrew Rayel"><svg><use href="#i-sc"/></svg></a></span></span></td>
+              <td class="pick-stage c2">Area Two</td>
+            </tr>
+          </tbody>
+        </table>
+      </details>
+    </div>
+  </details>
 
   <!-- ==================== FRIDAY ==================== -->
-  <section class="day-section">
-    <h2>Friday 27 February</h2>
+  <details class="collapsible day-section">
+    <summary>Friday 27 February</summary>
+    <div class="section-content">
 
     <div class="timetable-grid friday-grid timetable-desktop">
       <!-- Headers -->
@@ -514,11 +618,13 @@
         <div class="mobile-slot a3"><span class="mobile-time">00:00 - 01:00</span><span class="mobile-wrap"><span class="mobile-artist">Matty Ralph<small>Hard Trance</small></span><span class="slot-links"><a href="https://soundcloud.com/matty-ralphmusic/matty-ralph-live-a-state-of-trance-rotterdam-2025" class="set-link" target="_blank" rel="noopener" title="Matty Ralph"><svg><use href="#i-sc"/></svg></a></span></span></div>
       </div>
     </div>
-  </section>
+    </div>
+  </details>
 
   <!-- ==================== SATURDAY ==================== -->
-  <section class="day-section">
-    <h2>Saturday 28 February</h2>
+  <details class="collapsible day-section" open>
+    <summary>Saturday 28 February</summary>
+    <div class="section-content">
 
     <div class="timetable-grid saturday-grid timetable-desktop">
       <!-- Headers -->
@@ -760,13 +866,70 @@
         <div class="mobile-slot a5"><span class="mobile-time">04:00 - 05:00</span><span class="mobile-wrap"><span class="mobile-artist">Mrphlndr<small>Deep Trance</small></span><span class="slot-links"><span class="set-link no-link" title="No set found"><svg><use href="#i-no"/></svg></span></span></span></div>
       </div>
     </div>
-  </section>
+    </div>
+  </details>
 
   <footer class="page-footer">
     27-28 February 2026 &middot; Ahoy Rotterdam &middot; astateoftrance.com
   </footer>
 
   <script>
+    // Countdown timer for picked sets
+    (function() {
+      var picks = [
+        { start: new Date(2026,1,27,18,30), end: new Date(2026,1,27,20,0),  artist: 'Ruben de Ronde',        stage: 'Area One',  cls: 'c1' },
+        { start: new Date(2026,1,27,20,0),  end: new Date(2026,1,27,21,0),  artist: 'Armin van Buuren',       stage: 'Area One',  cls: 'c1' },
+        { start: new Date(2026,1,27,21,0),  end: new Date(2026,1,27,22,0),  artist: 'Aly & Fila',             stage: 'Area Two',  cls: 'c2' },
+        { start: new Date(2026,1,27,22,0),  end: new Date(2026,1,28,0,0),   artist: 'Armin van Buuren 25 Yrs', stage: 'Area One', cls: 'c1' },
+        { start: new Date(2026,1,28,21,0),  end: new Date(2026,1,28,22,0),  artist: 'Kyau & Albert',          stage: 'Area Four', cls: 'c4' },
+        { start: new Date(2026,1,28,22,0),  end: new Date(2026,1,28,23,0),  artist: 'Super8 & Tab',           stage: 'Area Four', cls: 'c4' },
+        { start: new Date(2026,1,28,23,0),  end: new Date(2026,2,1,0,0),    artist: 'Ottagon',                stage: 'Area Two',  cls: 'c2' },
+        { start: new Date(2026,2,1,0,0),    end: new Date(2026,2,1,1,0),    artist: 'Cosmic Gate',            stage: 'Area Two',  cls: 'c2' },
+        { start: new Date(2026,2,1,1,0),    end: new Date(2026,2,1,2,30),   artist: 'Armin van Buuren',       stage: 'Area One',  cls: 'c1' },
+        { start: new Date(2026,2,1,3,0),    end: new Date(2026,2,1,4,0),    artist: 'Andrew Rayel Presents Extasia', stage: 'Area Two', cls: 'c2' }
+      ];
+      var labelEl = document.getElementById('cb-label');
+      var detailsEl = document.getElementById('cb-details');
+      var timeEl = document.getElementById('cb-time');
+
+      function pad(n) { return n < 10 ? '0' + n : n; }
+
+      function fmt(diff) {
+        var h = Math.floor(diff / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+        return h > 0 ? h + ':' + pad(m) + ':' + pad(s) : m + ':' + pad(s);
+      }
+
+      function update() {
+        var now = new Date();
+        var playing = null, next = null;
+        for (var i = 0; i < picks.length; i++) {
+          if (now >= picks[i].start && now < picks[i].end) { playing = picks[i]; next = picks[i + 1] || null; break; }
+          if (now < picks[i].start) { next = picks[i]; break; }
+        }
+
+        if (playing && next) {
+          labelEl.textContent = 'Now: ' + playing.artist;
+          labelEl.className = 'cb-label ' + playing.cls;
+          detailsEl.innerHTML = '<span class="' + next.cls + '">' + next.artist + '</span><span class="cb-sep">/</span><span class="' + next.cls + '">' + next.stage + '</span>';
+          timeEl.textContent = fmt(next.start - now);
+        } else if (next) {
+          labelEl.textContent = 'Next up';
+          labelEl.className = 'cb-label';
+          detailsEl.innerHTML = '<span class="' + next.cls + '">' + next.artist + '</span><span class="cb-sep">/</span><span class="' + next.cls + '">' + next.stage + '</span>';
+          timeEl.textContent = fmt(next.start - now);
+        } else {
+          labelEl.textContent = '';
+          detailsEl.innerHTML = '';
+          timeEl.innerHTML = '<span style="color:var(--text-dim);font-size:0.85rem">No more picks</span>';
+        }
+      }
+
+      update();
+      setInterval(update, 1000);
+    })();
+
     // Register service worker for offline support
     if ('serviceWorker' in navigator) {
       var swCode = [
