@@ -61,12 +61,17 @@
     #countdown-bar .cb-acts {
       display: flex;
       justify-content: center;
-      gap: 16px;
+      flex-wrap: wrap;
+      gap: 4px 16px;
       font-weight: 600;
       font-size: 0.8rem;
       margin-bottom: 2px;
     }
     #countdown-bar .cb-act { white-space: nowrap; }
+    @media (max-width: 768px) {
+      #countdown-bar .cb-acts { flex-direction: column; gap: 2px; }
+      #countdown-bar .cb-act-sep { display: none; }
+    }
     #countdown-bar .cb-act-sep {
       color: var(--grid-line);
       font-weight: 400;
